@@ -24,3 +24,6 @@ class UserGetSchema(UserSchema):
     surname = fields.Str(dump_only=True)
     name = fields.Str(dump_only=True)
     lastname = fields.Str(dump_only=True)
+
+class MessageOnlySchema(Schema):
+    message = fields.Str(required=True)
