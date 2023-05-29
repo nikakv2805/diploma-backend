@@ -107,3 +107,11 @@ class TokenRefresh(MethodView):
         db.session.commit()
 
         return {"access_token": new_token}, 200
+
+
+@blp.route("/validate")
+class TokenValidate(MethodView):
+    @jwt_required()
+    def post(self):
+        jwt = get_jwt()
+        return {"is_owner": jwt.get("is_owner"), "shop_id": jwt.get("shop_id")}, 200
