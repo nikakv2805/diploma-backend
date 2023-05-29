@@ -11,7 +11,7 @@ from passlib.hash import pbkdf2_sha256
 
 from db import db
 from models import UserModel, BlocklistModel
-from schemas import UserGetSchema, UserRegisterSchema, UserSchema, MessageOnlySchema
+from schemas import UserGetSchema, UserRegisterSchema, UserSchema, MessageOnlySchema, SelfEditSchema
 
 
 blp = Blueprint("Auth", "auth", description="Operations on users")
@@ -133,3 +133,28 @@ class TokenValidate(MethodView):
     def post(self):
         jwt = get_jwt()
         return {"is_owner": jwt.get("is_owner"), "shop_id": jwt.get("shop_id")}
+
+
+@blp.route("/")
+class UserActions(MethodView):
+    @jwt_required()
+    @blp.arguments(SelfEditSchema)
+    @blp.response(200, MessageOnlySchema,
+                  description='Successfully changed myself.')
+    @blp.alt_response(401,
+                      description='Invalid credentials.')
+    def put(self, user_data):
+        user = UserModel.query.filter(
+            UserModel.username == user_data["username"]
+        ).first()
+
+        if user and pbkdf2_sha256.verify(user_data["password"], user.password):
+            user.password = pbkdf2_sha256.hash(user_data["new_password"])
+
+            db.session.add(user)
+            db.session.commit()
+
+            return {"message": "User edited successfully"}
+
+        abort(401, message="Invalid credentials.")
+

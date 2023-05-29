@@ -27,3 +27,6 @@ class UserGetSchema(UserSchema):
 
 class MessageOnlySchema(Schema):
     message = fields.Str(required=True)
+
+class SelfEditSchema(UserSchema):
+    new_password = fields.Str(required=True, load_only=True)
