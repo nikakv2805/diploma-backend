@@ -12,9 +12,15 @@ class UserRegisterSchema(UserSchema):
     email = fields.Email(required=True, load_only=True, validate=Length(max=255))
     is_owner = fields.Boolean(required=True, load_only=True)
     shop_id = fields.Int(required=True, load_only=True)
+    surname = fields.Str(required=True, load_only=True)
+    name = fields.Str(required=True, load_only=True)
+    lastname = fields.Str(required=True, load_only=True)
 
 
 class UserGetSchema(UserSchema):
     email = fields.Email(dump_only=True)
     is_owner = fields.Boolean(dump_only=True)
     shop_id = fields.Int(dump_only=True)
+    surname = fields.Str(dump_only=True)
+    name = fields.Str(dump_only=True)
+    lastname = fields.Str(dump_only=True)
