@@ -7,3 +7,4 @@ marshmallow
 python-dotenv
 gunicorn
 Flask-Migrate
+python-dotenv

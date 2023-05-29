@@ -2,31 +2,37 @@ from flask import Flask
 from flask_smorest import Api
 from flask_jwt_extended import JWTManager
 from flask_migrate import Migrate
+from dotenv import load_dotenv
+import os
 
 from db import db
 
 from resources import UserBlueprint
 from jwt_settings import jwt_set_up
 
+dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
+load_dotenv(dotenv_path)
 
-def create_app(db_url=None):
+
+def create_app():
     app = Flask(__name__)
     app.config["API_TITLE"] = "Ostrich Auth Service REST API"
-    app.config["API_VERSION"] = "v1"
+    app.config["API_VERSION"] = os.environ.get("API_VERSION")
     app.config["OPENAPI_VERSION"] = "3.0.3"
     app.config["OPENAPI_URL_PREFIX"] = "/"
     app.config["OPENAPI_SWAGGER_UI_PATH"] = "/swagger-ui"
     app.config[
         "OPENAPI_SWAGGER_UI_URL"
     ] = "https://cdn.jsdelivr.net/npm/swagger-ui-dist/"
-    app.config["SQLALCHEMY_DATABASE_URI"] = db_url or "sqlite:///data.db"
+    app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URI")
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     app.config["PROPAGATE_EXCEPTIONS"] = True
     db.init_app(app)
+
     migrate = Migrate(app, db)
     api = Api(app)
 
-    app.config["JWT_SECRET_KEY"] = "jose"
+    app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY")
     jwt = JWTManager(app)
     jwt_set_up(jwt)
 
