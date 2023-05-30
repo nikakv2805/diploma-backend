@@ -29,6 +29,7 @@ services:
     depends_on:
       - auth_service_back
       - gateway_redis
+      - shop_info_service_back
     ports:
       - 5001:5001
     working_dir: /app
@@ -46,7 +47,31 @@ services:
       - gateway_db:/data
       - ./gateway_service/db/redis.conf:/usr/local/etc/redis/redis.conf
     #  TODO: Make redis to read config files; NOW REDIS IS UNPROTECTED
+  shop_info_service_back:
+    image: shop_info_service:1.0.1
+    depends_on:
+      - shop_info_db
+    ports:
+      - 5002:5002
+    working_dir: /app
+    volumes:
+      - /c/Users/nikak/Documents/study/4 курс/ПРАКТИКА/code/backend/shop_info_service:/app
+    env_file:
+      - ./shop_info_service/.env
+    restart: always
+  shop_info_db:
+    image: postgres:latest
+    volumes:
+      - shop_info_db:/var/lib/postgresql/data
+    ports:
+      - 5433:5432
+    environment:
+      POSTGRES_DB: shop_info
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: 1234
+    restart: always
 
 volumes:
   auth_db:
   gateway_db:
+  shop_info_db:
