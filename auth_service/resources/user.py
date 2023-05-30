@@ -78,18 +78,15 @@ class User(MethodView):
         return {"message": "User deleted."}
 
 
-@blp.route("/")
+@blp.route("/<int:user_id>")
 class UserActions(MethodView):
-    # @jwt_required()
     @blp.arguments(SelfEditSchema)
     @blp.response(200, MessageOnlySchema,
                   description='Successfully changed myself.')
     @blp.alt_response(401,
                       description='Invalid credentials.')
-    def put(self, user_data):
-        user = UserModel.query.filter(
-            UserModel.username == user_data["username"]
-        ).first()
+    def put(self, user_data, user_id):
+        user = UserModel.query.get_or_404(user_id)
 
         if user and pbkdf2_sha256.verify(user_data["password"], user.password):
             user.password = pbkdf2_sha256.hash(user_data["new_password"])

@@ -10,14 +10,13 @@ class UserSchema(Schema):
 
 class UserRegisterSchema(UserSchema):
     email = fields.Email(required=True, load_only=True, validate=Length(max=255))
-    is_owner = fields.Boolean(required=True, load_only=True)
-    shop_id = fields.Int(required=True, load_only=True)
     surname = fields.Str(required=True, load_only=True)
     name = fields.Str(required=True, load_only=True)
     lastname = fields.Str(required=True, load_only=True)
 
 
-class SelfEditSchema(UserSchema):
+class SelfEditSchema(Schema):
+    password = fields.Str(required=True, load_only=True)  # TODO: validation of the password
     new_password = fields.Str(required=True, load_only=True)
 
 

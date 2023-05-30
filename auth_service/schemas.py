@@ -30,5 +30,6 @@ class MessageOnlySchema(Schema):
     message = fields.Str(required=True)
 
 
-class SelfEditSchema(UserSchema):
+class SelfEditSchema(Schema):
+    password = fields.Str(required=True, load_only=True)  # TODO: validation of the password
     new_password = fields.Str(required=True, load_only=True)

@@ -22,11 +22,20 @@ AUTH_SERVICE_URL = os.environ.get("AUTH_SERVICE_URL")
 
 @blp.route("/register")
 class UserRegister(MethodView):
+    @jwt_required(fresh=True)
     @blp.arguments(UserRegisterSchema)
     @blp.response(201, MessageOnlySchema,
                   description="Registers new user with unique email and username")
+    @blp.alt_response(401, description='Should be owner to register accounts.')
     @blp.alt_response(409, description='Returned if user with this email or username already exists.')
     def post(self, user_data):
+        jwt = get_jwt()
+        if not jwt.get("is_owner"):
+            abort(401, message="Should be owner to register accounts.")
+
+        user_data["is_owner"] = False
+        user_data["shop_id"] = jwt.get("shop_id")
+
         # current_app.logger.info(type(user_data))
         result = requests.post(f'{AUTH_SERVICE_URL}/register',
                                data=json.dumps(user_data),
@@ -100,7 +109,9 @@ class UserActions(MethodView):
     @blp.alt_response(401,
                       description='Invalid credentials.')
     def put(self, user_data):
-        result = requests.put(f'{AUTH_SERVICE_URL}/',
+        user_id = get_jwt_identity()
+
+        result = requests.put(f'{AUTH_SERVICE_URL}/{user_id}',
                               data=json.dumps(user_data),
                               headers=flask_request.headers)
         return jsonify(eval(result.text)), result.status_code
