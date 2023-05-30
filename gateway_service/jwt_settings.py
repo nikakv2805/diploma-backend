@@ -1,16 +1,16 @@
 from flask import jsonify
 from flask_jwt_extended import JWTManager
 # from models import BlocklistModel, UserModel
-from blocklist import BLOCKLIST
+from blocklist import Blocklist, BLOCKLIST
 
 import requests
 
 
-def jwt_set_up(jwt: JWTManager):
+def jwt_set_up(jwt: JWTManager, blocklist: Blocklist = BLOCKLIST):
     @jwt.token_in_blocklist_loader
     def check_if_token_in_blocklist(jwt_header, jwt_payload):
         searched_token = jwt_payload["jti"]
-        return searched_token in BLOCKLIST
+        return blocklist.in_blocklist(searched_token)
 
     @jwt.expired_token_loader
     def expired_token_callback(jwt_header, jwt_payload):

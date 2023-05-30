@@ -1,4 +1,5 @@
 from flask import Flask
+from redis import Redis
 from flask_smorest import Api
 from flask_jwt_extended import JWTManager
 from dotenv import load_dotenv
@@ -10,9 +11,10 @@ from jwt_settings import jwt_set_up
 dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
 load_dotenv(dotenv_path)
 
-
 def create_app():
     app = Flask(__name__)
+    app.config["REDIS_URL"] = os.environ.get("REDIS_URL")
+
     app.config["API_TITLE"] = "Ostrich Gateway REST API"
     app.config["API_VERSION"] = os.environ.get("API_VERSION")
     app.config["OPENAPI_VERSION"] = "3.0.3"

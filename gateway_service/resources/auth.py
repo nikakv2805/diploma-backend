@@ -16,7 +16,6 @@ import json
 from schemas import UserRegisterSchema, UserSchema, MessageOnlySchema, SelfEditSchema
 from blocklist import BLOCKLIST
 
-
 blp = Blueprint("Auth", "auth", description="Operations on users and with JWT tokens")
 
 AUTH_SERVICE_URL = os.environ.get("AUTH_SERVICE_URL")
@@ -68,7 +67,7 @@ class UserLogout(MethodView):
     @blp.response(200, MessageOnlySchema)
     def post(self):
         jti = get_jwt()["jti"]
-        BLOCKLIST.add(jti)
+        BLOCKLIST.put_blocklist(jti)
         return {"message": "Successfully logged out"}
 
 
@@ -87,7 +86,7 @@ class TokenRefresh(MethodView):
                                         additional_claims=claims)
 
         jti = jwt["jti"]
-        BLOCKLIST.add(jti)
+        BLOCKLIST.put_blocklist(jti)
 
         return {"access_token": new_token}
 

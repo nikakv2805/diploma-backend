@@ -16,7 +16,7 @@ services:
   auth_db:
     image: postgres:latest
     volumes:
-      - instance:/var/lib/postgresql/data
+      - auth_db:/var/lib/postgresql/data
     ports:
       - 5432:5432
     environment:
@@ -25,17 +25,28 @@ services:
       POSTGRES_PASSWORD: 1234
     restart: always
   gateway_service_back:
-    image: gateway_service:1.1.1
+    image: gateway_service:1.1.3
     depends_on:
       - auth_service_back
+      - gateway_redis
     ports:
       - 5001:5001
     working_dir: /app
     volumes:
       - /c/Users/nikak/Documents/study/4 курс/ПРАКТИКА/code/backend/gateway_service:/app
     env_file:
-      - gateway_service/.env
+      - ./gateway_service/.env
     restart: always
+  gateway_redis:
+    image: redislabs/redismod
+    restart: always
+    ports:
+      - 6379:6379
+    volumes:
+      - gateway_db:/data
+      - ./gateway_service/db/redis.conf:/usr/local/etc/redis/redis.conf
+    #  TODO: Make redis to read config files; NOW REDIS IS UNPROTECTED
 
 volumes:
-  instance:
+  auth_db:
+  gateway_db:
