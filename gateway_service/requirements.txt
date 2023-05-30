@@ -1,0 +1,6 @@
+flask
+Flask-Smorest
+marshmallow
+python-dotenv
+gunicorn
+requests

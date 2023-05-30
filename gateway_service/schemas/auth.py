@@ -17,18 +17,5 @@ class UserRegisterSchema(UserSchema):
     lastname = fields.Str(required=True, load_only=True)
 
 
-class UserGetSchema(UserSchema):
-    email = fields.Email(dump_only=True)
-    is_owner = fields.Boolean(dump_only=True)
-    shop_id = fields.Int(dump_only=True)
-    surname = fields.Str(dump_only=True)
-    name = fields.Str(dump_only=True)
-    lastname = fields.Str(dump_only=True)
-
-
-class MessageOnlySchema(Schema):
-    message = fields.Str(required=True)
-
-
 class SelfEditSchema(UserSchema):
     new_password = fields.Str(required=True, load_only=True)

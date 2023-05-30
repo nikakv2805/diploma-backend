@@ -1,3 +1,4 @@
+from flask import current_app
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
 from flask_jwt_extended import (
@@ -24,6 +25,7 @@ class UserRegister(MethodView):
                   description="Registers new user with unique email and username")
     @blp.alt_response(409, description='Returned if user with this email or username already exists.')
     def post(self, user_data):
+        # current_app.logger.info(type(user_data))
         if UserModel.query.filter(UserModel.username == user_data["username"]).first():
             abort(409, message="A user with that username already exists.")
 
