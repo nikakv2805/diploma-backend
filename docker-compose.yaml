@@ -2,7 +2,7 @@ version: '3'
 
 services:
   auth_service_back:
-    image: auth_service:1.2.1
+    image: auth_service:1.2.2
     depends_on:
       - auth_db
     ports:
@@ -25,7 +25,7 @@ services:
       POSTGRES_PASSWORD: 1234
     restart: always
   gateway_service_back:
-    image: gateway_service:1.0
+    image: gateway_service:1.1.1
     depends_on:
       - auth_service_back
     ports:

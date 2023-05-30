@@ -1,9 +1,11 @@
 from flask import Flask
 from flask_smorest import Api
+from flask_jwt_extended import JWTManager
 from dotenv import load_dotenv
 import os
 
 from resources import AuthBlueprint
+from jwt_settings import jwt_set_up
 
 dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
 load_dotenv(dotenv_path)
@@ -22,6 +24,12 @@ def create_app():
     app.config["PROPAGATE_EXCEPTIONS"] = True
 
     api = Api(app)
+
+    app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY")
+    app.config["JWT_ACCESS_TOKEN_EXPIRES"] = int(os.environ.get("JWT_ACCESS_TOKEN_EXP", 900))
+    app.config["JWT_REFRESH_TOKEN_EXPIRES"] = int(os.environ.get("JWT_REFRESH_TOKEN_EXP", 1800))
+    jwt = JWTManager(app)
+    jwt_set_up(jwt)
 
     api.register_blueprint(AuthBlueprint)
 

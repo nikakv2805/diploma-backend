@@ -1,6 +1,5 @@
 from flask import Flask
 from flask_smorest import Api
-from flask_jwt_extended import JWTManager
 from flask_migrate import Migrate
 from dotenv import load_dotenv
 import os
@@ -8,7 +7,6 @@ import os
 from db import db
 
 from resources import UserBlueprint
-from jwt_settings import jwt_set_up
 
 dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
 load_dotenv(dotenv_path)
@@ -31,10 +29,6 @@ def create_app():
 
     migrate = Migrate(app, db)
     api = Api(app)
-
-    app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY")
-    jwt = JWTManager(app)
-    jwt_set_up(jwt)
 
     api.register_blueprint(UserBlueprint)
 

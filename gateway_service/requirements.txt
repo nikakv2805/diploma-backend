@@ -1,5 +1,6 @@
 flask
 Flask-Smorest
+Flask-JWT-Extended
 marshmallow
 python-dotenv
 gunicorn

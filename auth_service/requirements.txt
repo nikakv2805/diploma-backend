@@ -1,5 +1,4 @@
 flask
-Flask-JWT-Extended
 Flask-Smorest
 Flask-SQLAlchemy
 passlib
