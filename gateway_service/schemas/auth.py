@@ -19,3 +19,10 @@ class UserRegisterSchema(UserSchema):
 
 class SelfEditSchema(UserSchema):
     new_password = fields.Str(required=True, load_only=True)
+
+
+class OwnerRegisterSchema(UserSchema):
+    email = fields.Email(required=True, load_only=True, validate=Length(max=255))
+    surname = fields.Str(required=True, load_only=True)
+    name = fields.Str(required=True, load_only=True)
+    lastname = fields.Str(required=True, load_only=True)

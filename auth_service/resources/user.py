@@ -14,8 +14,7 @@ blp = Blueprint("Auth", "auth", description="Operations on users")
 @blp.route("/register")
 class UserRegister(MethodView):
     @blp.arguments(UserRegisterSchema)
-    @blp.response(201, MessageOnlySchema,
-                  description="Registers new user with unique email and username")
+    @blp.response(201, description="Registers new user with unique email and username")
     @blp.alt_response(409, description='Returned if user with this email or username already exists.')
     def post(self, user_data):
         # current_app.logger.info(type(user_data))
@@ -38,7 +37,7 @@ class UserRegister(MethodView):
         db.session.add(user)
         db.session.commit()
 
-        return {"message": "User created successfully."}
+        return {"id": user.id, "message": "User created successfully."}
 
 
 @blp.route("/login")

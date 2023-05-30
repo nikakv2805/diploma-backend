@@ -13,8 +13,7 @@ blp = Blueprint("Shops", "shops", description="Operations on shops")
 @blp.route("/shop/register")
 class ShopRegister(MethodView):
     @blp.arguments(ShopSchema)
-    @blp.response(201, MessageOnlySchema,
-                  description="Registers new shop with unique address")
+    @blp.response(201, description="Registers new shop with unique address")
     @blp.alt_response(409, description='Returned if there is already a shop with this address in the database.')
     def post(self, shop_data):
         if ShopModel.query.filter(ShopModel.address == shop_data["address"]).first():
@@ -29,7 +28,7 @@ class ShopRegister(MethodView):
         db.session.add(shop)
         db.session.commit()
 
-        return {"message": "Shop created successfully."}
+        return {"id": shop.id, "message": "Shop created successfully."}
 
 
 @blp.route("/shop/<int:shop_id>/owner/<int:owner_id>")
