@@ -15,6 +15,7 @@ import json
 
 from schemas import UserRegisterSchema, UserSchema, MessageOnlySchema, SelfEditSchema
 from blocklist import BLOCKLIST
+from resources.utils import send_request
 
 blp = Blueprint("Auth", "auth", description="Operations on users and with JWT tokens")
 
@@ -36,11 +37,8 @@ class UserRegister(MethodView):
         user_data["is_owner"] = False
         user_data["shop_id"] = jwt.get("shop_id")
 
-        # current_app.logger.info(type(user_data))
-        result = requests.post(f'{AUTH_SERVICE_URL}/register',
-                               data=json.dumps(user_data),
-                               headers=flask_request.headers)
-        return jsonify(eval(result.text)), result.status_code
+        result = send_request('POST', f'{AUTH_SERVICE_URL}/register', data=user_data)
+        return result["result_json"], result["status_code"]
 
 @blp.route("/login")
 class UserLogin(MethodView):
@@ -51,14 +49,12 @@ class UserLogin(MethodView):
     @blp.alt_response(401,
                       description='Invalid credentials.')
     def post(self, user_data):
-        result = requests.post(f'{AUTH_SERVICE_URL}/login',
-                               data=json.dumps(user_data),
-                               headers=flask_request.headers)
+        result = send_request('POST', f'{AUTH_SERVICE_URL}/login', data=user_data)
 
-        if result.status_code != 200:
-            return jsonify(eval(result.text)), result.status_code
+        if result["status_code"] != 200:
+            return result["result_json"], result["status_code"]
 
-        user_data = json.loads(result.text)
+        user_data = result["result_obj"]
 
         access_token = create_access_token(identity=user_data["id"], fresh=True,
                                            additional_claims={'is_owner': user_data['is_owner'],
@@ -110,8 +106,5 @@ class UserActions(MethodView):
                       description='Invalid credentials.')
     def put(self, user_data):
         user_id = get_jwt_identity()
-
-        result = requests.put(f'{AUTH_SERVICE_URL}/{user_id}',
-                              data=json.dumps(user_data),
-                              headers=flask_request.headers)
-        return jsonify(eval(result.text)), result.status_code
+        result = send_request('PUT', f'{AUTH_SERVICE_URL}/{user_id}', data=user_data)
+        return result["result_json"], result["status_code"]

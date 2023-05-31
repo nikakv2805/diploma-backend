@@ -11,7 +11,7 @@ import json
 import os
 
 from schemas import ShopSchema, MessageOnlySchema, ShopEditSchema, ShopEditCashSchema, ShopRegisterSchema
-from resources.utils import is_staff_member, is_shop_owner
+from resources.utils import is_staff_member, is_shop_owner, send_request
 
 
 blp = Blueprint("Shops", "shops", description="Operations on shops")
@@ -34,18 +34,12 @@ class ShopRegister(MethodView):
             "address": shop_owner_data["address"]
         }
 
-        result = requests.post(f'{SHOP_SERVICE_URL}/shop/register',
-                               data=json.dumps(shop_data),
-                               headers=flask_request.headers)
+        result_shop_register = send_request('POST', f'{SHOP_SERVICE_URL}/shop/register', data=shop_data)
 
-        result_obj = json.loads(result.text)
+        if result_shop_register["status_code"] != 201:
+            return result_shop_register["result_json"], result_shop_register["status_code"]
 
-        if result.status_code != 201:
-            return jsonify(result_obj), result.status_code
-
-        # current_app.logger.info(f'Shop ID: {result_obj["id"]}')
-
-        shop_id = result_obj["id"]
+        shop_id = result_shop_register["result_obj"]["id"]
 
         owner_data = {
             "name": shop_owner_data["name"],
@@ -58,31 +52,21 @@ class ShopRegister(MethodView):
             "shop_id": shop_id
         }
 
-        result_2 = requests.post(f'{AUTH_SERVICE_URL}/register',
-                                 data=json.dumps(owner_data),
-                                 headers=flask_request.headers)
+        result_owner_register = send_request('POST', f'{AUTH_SERVICE_URL}/register', data=owner_data)
 
-        result_2_obj = json.loads(result_2.text)
+        if result_owner_register["status_code"] != 201:
+            send_request('DELETE', f'{SHOP_SERVICE_URL}/shop/{shop_id}')
 
-        if result_2.status_code != 201:
-            requests.delete(f'{SHOP_SERVICE_URL}/shop/{shop_id}',
-                            headers=flask_request.headers)
-            return jsonify(result_obj), result_2.status_code
+            return result_owner_register["result_json"], result_owner_register["status_code"]
 
-        owner_id = result_2_obj["id"]
+        owner_id = result_owner_register["result_obj"]["id"]
 
-        result_3 = requests.post(f'{SHOP_SERVICE_URL}/shop/{shop_id}/owner/{owner_id}',
-                                 data=json.dumps(shop_data),
-                                 headers=flask_request.headers)
+        result_shop_to_owner = send_request('POST', f'{SHOP_SERVICE_URL}/shop/{shop_id}/owner/{owner_id}')
 
-        result_3_obj = json.loads(result_3.text)
-
-        if result_3.status_code != 200:
-            requests.delete(f'{SHOP_SERVICE_URL}/shop/{shop_id}',
-                            headers=flask_request.headers)
-            requests.delete(f'{AUTH_SERVICE_URL}/{owner_id}',
-                            headers=flask_request.headers)
-            return jsonify(result_3_obj), result_3.status_code
+        if result_shop_to_owner["status_code"] != 200:
+            send_request('DELETE', f'{SHOP_SERVICE_URL}/shop/{shop_id}')
+            send_request('DELETE', f'{AUTH_SERVICE_URL}/{owner_id}')
+            return result_shop_to_owner["result_json"], result_shop_to_owner["status_code"]
 
         return {"message": "Shop and owner's account created successfully."}
 
@@ -95,12 +79,8 @@ class User(MethodView):
     @blp.alt_response(404, description='Shop wasn\'t found')
     def get(self, shop_id):
         is_staff_member(shop_id)
-
-        result = requests.get(f'{SHOP_SERVICE_URL}/shop/{shop_id}',
-                              headers=flask_request.headers)
-
-        result_obj = json.loads(result.text)
-        return jsonify(result_obj), result.status_code
+        result = send_request('GET', f'{SHOP_SERVICE_URL}/shop/{shop_id}')
+        return result["result_json"], result["status_code"]
 
     @jwt_required(fresh=True)
     @blp.arguments(ShopEditSchema)
@@ -110,13 +90,8 @@ class User(MethodView):
     @blp.alt_response(409, description='Returned if there is already a shop with new address in the database.')
     def put(self, shop_edit_details, shop_id):
         is_shop_owner(shop_id)
-
-        result = requests.put(f'{SHOP_SERVICE_URL}/shop/{shop_id}',
-                              data=json.dumps(shop_edit_details),
-                              headers=flask_request.headers)
-
-        result_obj = json.loads(result.text)
-        return jsonify(result_obj), result.status_code
+        result = send_request('PUT', f'{SHOP_SERVICE_URL}/shop/{shop_id}', data=shop_edit_details)
+        return result["result_json"], result["status_code"]
 
     @jwt_required(fresh=True)
     @blp.response(200, MessageOnlySchema)
@@ -124,12 +99,8 @@ class User(MethodView):
     @blp.alt_response(404, description='Shop wasn\'t found.')
     def delete(self, shop_id):
         is_shop_owner(shop_id)
-
-        result = requests.delete(f'{SHOP_SERVICE_URL}/shop/{shop_id}',
-                                 headers=flask_request.headers)
-
-        result_obj = json.loads(result.text)
-        return jsonify(result_obj), result.status_code
+        result = send_request('DELETE', f'{SHOP_SERVICE_URL}/shop/{shop_id}')
+        return result["result_json"], result["status_code"]
 
 
 @blp.route("/shop/<int:shop_id>/cash_edit")
@@ -141,10 +112,5 @@ class User(MethodView):
     @blp.alt_response(404, description='Shop wasn\'t found')
     def post(self, shop_cash_edit, shop_id):
         is_staff_member(shop_id)
-
-        result = requests.post(f'{SHOP_SERVICE_URL}/shop/{shop_id}/cash_edit',
-                               data=json.dumps(shop_cash_edit, default=str),
-                               headers=flask_request.headers)
-
-        result_obj = json.loads(result.text)
-        return jsonify(result_obj), result.status_code
+        result = send_request('POST', f'{SHOP_SERVICE_URL}/shop/{shop_id}/cash_edit', data=shop_cash_edit)
+        return result["result_json"], result["status_code"]
