@@ -13,7 +13,7 @@ import logging
 import os
 import json
 
-from schemas import UserRegisterSchema, UserSchema, MessageOnlySchema, SelfEditSchema
+from schemas import UserRegisterSchema, UserSchema, MessageOnlySchema, SelfEditSchema, MessageWithIDSchema
 from blocklist import BLOCKLIST
 from resources.utils import send_request
 
@@ -25,7 +25,7 @@ AUTH_SERVICE_URL = os.environ.get("AUTH_SERVICE_URL")
 class UserRegister(MethodView):
     @jwt_required(fresh=True)
     @blp.arguments(UserRegisterSchema)
-    @blp.response(201, MessageOnlySchema,
+    @blp.response(201, MessageWithIDSchema,
                   description="Registers new user with unique email and username")
     @blp.alt_response(401, description='Should be owner to register accounts.')
     @blp.alt_response(409, description='Returned if user with this email or username already exists.')
