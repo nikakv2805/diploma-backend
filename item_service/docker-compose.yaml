@@ -1,0 +1,29 @@
+version: '3'
+
+services:
+  auth_service_back:
+    image: auth_service:1.2
+    depends_on:
+      - auth_db
+    ports:
+      - 5000:5000
+    working_dir: /app
+    volumes:
+      - /c/Users/nikak/Documents/study/4 курс/ПРАКТИКА/code/backend/auth_service:/app
+    env_file:
+      - .env
+    restart: always
+  auth_db:
+    image: postgres:latest
+    volumes:
+      - instance:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_DB: auth
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: 1234
+    restart: always
+
+volumes:
+  instance:

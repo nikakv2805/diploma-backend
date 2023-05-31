@@ -30,6 +30,7 @@ services:
       - auth_service_back
       - gateway_redis
       - shop_info_service_back
+      - item_service_back
     ports:
       - 5001:5001
     working_dir: /app
@@ -70,8 +71,32 @@ services:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: 1234
     restart: always
+  item_service_back:
+    image: item_service:1.0
+    depends_on:
+      - item_db
+    ports:
+      - 5003:5003
+    working_dir: /app
+    volumes:
+      - /c/Users/nikak/Documents/study/4 курс/ПРАКТИКА/code/backend/item_service:/app
+    env_file:
+      - ./item_service/.env
+    restart: always
+  item_db:
+    image: postgres:latest
+    volumes:
+      - item_db:/var/lib/postgresql/data
+    ports:
+      - 5434:5432
+    environment:
+      POSTGRES_DB: item
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: 1234
+    restart: always
 
 volumes:
   auth_db:
   gateway_db:
   shop_info_db:
+  item_db:
