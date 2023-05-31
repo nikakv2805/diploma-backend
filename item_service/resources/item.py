@@ -4,7 +4,7 @@ from flask_smorest import Blueprint, abort
 import os
 
 from db import db
-from models import ItemModel, ItemFolderModel
+from models import ItemModel, ItemFolderModel, ItemTypeEnum, UnitsEnum
 from schemas import ItemCreateSchema, MessageOnlySchema, ItemReturnSchema, \
     ItemEditSchema, ItemCountEditSchema, ItemSearchSchema, ShopIDSchema
 
@@ -38,7 +38,11 @@ class ItemCreate(MethodView):
         if folder.shop_id != item_data["shop_id"]:
             abort(409, message="Shop ID of folder and new item are different.")
 
-        current_app.logger.info(len(str(item_data["bar_code"])))
+        if item_data["type"] == "SERVICE" and "unit" in item_data and item_data["unit"] != "PIECE":
+            abort(409, message="Services are only counted in pieces")
+
+        if "unit" not in item_data:
+            item_data["unit"] = "PIECE"
 
         item = ItemModel(
             **item_data,
@@ -116,7 +120,11 @@ class Item(MethodView):
             item.price = item_edit_data["new_price"]
         if "new_type" in item_edit_data:
             item.type = item_edit_data["new_type"]
+            if item.type == "SERVICE":
+                item.unit = "PIECE"
         if "new_unit" in item_edit_data:
+            if item.type == "SERVICE" and item_edit_data["new_unit"] != "PIECE":
+                abort(409, message="Services can be measured only in pieces")
             item.unit = item_edit_data["new_unit"]
 
         db.session.add(item)
@@ -152,6 +160,8 @@ class ItemCounts(MethodView):
                 abort(404, message=f"Item with ID {item_count_data['id']} not found.")
             if item.shop_id != shop_id:
                 abort(401, message="Items should belong to your store!")
+            if item.type == ItemTypeEnum.SERVICE:
+                abort(409, message="Services count can't be changed.")
             item.count_existing += item_count_data["count_delta"]
 
         db.session.commit()
