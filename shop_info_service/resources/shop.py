@@ -100,8 +100,7 @@ class User(MethodView):
     @blp.alt_response(404, description='Shop wasn\'t found')
     def post(self, shop_cash_edit, shop_id):
         shop = ShopModel.query.get_or_404(shop_id)
-        current_app.logger.info(shop_cash_edit["cash_delta"])
-        current_app.logger.info(type(shop.current_cash))
+
         shop.current_cash += shop_cash_edit["cash_delta"]
 
         db.session.add(shop)

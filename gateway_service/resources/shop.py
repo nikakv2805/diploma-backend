@@ -2,8 +2,6 @@ from flask import current_app, request as flask_request, jsonify
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
 from flask_jwt_extended import (
-    create_access_token,
-    create_refresh_token,
     get_jwt_identity,
     get_jwt,
     jwt_required,
@@ -13,6 +11,7 @@ import json
 import os
 
 from schemas import ShopSchema, MessageOnlySchema, ShopEditSchema, ShopEditCashSchema, ShopRegisterSchema
+from resources.utils import is_staff_member, is_shop_owner
 
 
 blp = Blueprint("Shops", "shops", description="Operations on shops")
@@ -95,9 +94,7 @@ class User(MethodView):
     @blp.alt_response(401, description="Requester doesn't belong to the requested shop.")
     @blp.alt_response(404, description='Shop wasn\'t found')
     def get(self, shop_id):
-        jwt = get_jwt()
-        if jwt.get("shop_id") != shop_id:
-            abort(401, message="Should belong to the shop staff.")
+        is_staff_member(shop_id)
 
         result = requests.get(f'{SHOP_SERVICE_URL}/shop/{shop_id}',
                               headers=flask_request.headers)
@@ -112,9 +109,7 @@ class User(MethodView):
     @blp.alt_response(404, description='Shop wasn\'t found.')
     @blp.alt_response(409, description='Returned if there is already a shop with new address in the database.')
     def put(self, shop_edit_details, shop_id):
-        jwt = get_jwt()
-        if jwt.get("shop_id") != shop_id or not jwt.get("is_owner"):
-            abort(401, message="Should be the shop owner.")
+        is_shop_owner(shop_id)
 
         result = requests.put(f'{SHOP_SERVICE_URL}/shop/{shop_id}',
                               data=json.dumps(shop_edit_details),
@@ -128,9 +123,7 @@ class User(MethodView):
     @blp.alt_response(401, description="Requester isn't requested shop's owner.")
     @blp.alt_response(404, description='Shop wasn\'t found.')
     def delete(self, shop_id):
-        jwt = get_jwt()
-        if jwt.get("shop_id") != shop_id or not jwt.get("is_owner"):
-            abort(401, message="Should be the shop owner.")
+        is_shop_owner(shop_id)
 
         result = requests.delete(f'{SHOP_SERVICE_URL}/shop/{shop_id}',
                                  headers=flask_request.headers)
@@ -147,9 +140,7 @@ class User(MethodView):
     @blp.alt_response(401, description="Requester doesn't belong to the requested shop.")
     @blp.alt_response(404, description='Shop wasn\'t found')
     def post(self, shop_cash_edit, shop_id):
-        jwt = get_jwt()
-        if jwt.get("shop_id") != shop_id:
-            abort(401, message="Should belong to the shop staff.")
+        is_staff_member(shop_id)
 
         result = requests.post(f'{SHOP_SERVICE_URL}/shop/{shop_id}/cash_edit',
                                data=json.dumps(shop_cash_edit, default=str),
