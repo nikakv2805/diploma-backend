@@ -6,7 +6,7 @@ import os
 from db import db
 from models import ItemModel, ItemFolderModel
 from schemas import ItemCreateSchema, MessageOnlySchema, ItemReturnSchema, \
-    ItemEditSchema, ItemCountEditSchema, ItemSearchSchema
+    ItemEditSchema, ItemCountEditSchema, ItemSearchSchema, ShopIDSchema
 
 
 blp = Blueprint("Item", "item", description="Operations on items")
@@ -59,18 +59,28 @@ class ItemList(MethodView):
 
 @blp.route("/item/<int:item_id>")
 class Item(MethodView):
+    @blp.arguments(ShopIDSchema, location="query")
     @blp.response(200, ItemReturnSchema, description="Item returned successfully.")
+    @blp.alt_response(401, description="Must be a staff member.")
     @blp.alt_response(404, description="Item wasn't found.")
-    def get(self, item_id):
+    def get(self, shop_id_data, item_id):
+        shop_id = shop_id_data["shop_id"]
         item = ItemModel.query.get_or_404(item_id)
+        if item.shop_id != shop_id:
+            abort(401, message="You must be shop staff member!")
         return item
 
     @blp.arguments(ItemEditSchema)
+    @blp.arguments(ShopIDSchema, location="query")
     @blp.response(200, ItemReturnSchema, description="Item edited successfully.")
+    @blp.alt_response(401, description="Must be a staff member.")
     @blp.alt_response(404, description="Item or new folder wasn't found.")
     @blp.alt_response(409, description="One of new item's name, article or barcode is already in the DB.")
-    def put(self, item_edit_data, item_id):
+    def put(self, item_edit_data, shop_id_data, item_id):
         item = ItemModel.query.get_or_404(item_id)
+        shop_id = shop_id_data["shop_id"]
+        if item.shop_id != shop_id:
+            abort(401, message="You must be shop staff member!")
 
         if "new_article" in item_edit_data and \
                 ItemModel.query.filter(ItemModel.shop_id == item.shop_id,
@@ -114,10 +124,15 @@ class Item(MethodView):
 
         return item
 
+    @blp.arguments(ShopIDSchema, location="query")
     @blp.response(200, MessageOnlySchema, description="Item deleted successfully.")
+    @blp.alt_response(401, description="Must be a staff member.")
     @blp.alt_response(404, description="Item wasn't found")
-    def delete(self, item_id):
+    def delete(self, shop_id_data, item_id):
         item = ItemModel.query.get_or_404(item_id)
+        shop_id = shop_id_data["shop_id"]
+        if item.shop_id != shop_id:
+            abort(401, message="You must be shop staff member!")
         db.session.delete(item)
         db.session.commit()
         return {"message": "Item deleted."}
@@ -126,13 +141,17 @@ class Item(MethodView):
 @blp.route("/item/update_counts")
 class ItemCounts(MethodView):
     @blp.arguments(ItemCountEditSchema(many=True))
+    @blp.arguments(ShopIDSchema, location="query")
     @blp.response(200, MessageOnlySchema, description="All item's counts updated")
     @blp.alt_response(404, description="One of the items wasn't found.")
-    def put(self, items_count_edit_data):
+    def put(self, items_count_edit_data, shop_id_data):
+        shop_id = shop_id_data["shop_id"]
         for item_count_data in items_count_edit_data:
             item = ItemModel.query.get(item_count_data["id"])
             if item is None:
                 abort(404, message=f"Item with ID {item_count_data['id']} not found.")
+            if item.shop_id != shop_id:
+                abort(401, message="Items should belong to your store!")
             item.count_existing += item_count_data["count_delta"]
 
         db.session.commit()

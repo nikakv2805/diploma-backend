@@ -4,7 +4,7 @@ from flask_smorest import Blueprint, abort
 
 from db import db
 from models import ItemModel, ItemFolderModel
-from schemas import FolderCreateSchema, MessageOnlySchema, FolderReturnSchema, FolderEditSchema
+from schemas import FolderCreateSchema, MessageOnlySchema, FolderReturnSchema, FolderEditSchema, ShopIDSchema
 
 
 blp = Blueprint("Folder", "folder", description="Operations on item folders")
@@ -37,18 +37,26 @@ class FolderList(MethodView):
 
 @blp.route("/folder/<int:folder_id>")
 class Folder(MethodView):
+    @blp.arguments(ShopIDSchema, location="query")
     @blp.response(200, FolderReturnSchema, description="Folder returned successfully.")
     @blp.alt_response(404, description="Folder with this id wasn't found.")
-    def get(self, folder_id):
+    def get(self, shop_id_data, folder_id):
+        shop_id = shop_id_data["shop_id"]
         folder = ItemFolderModel.query.get_or_404(folder_id)
+        if folder.shop_id != shop_id:
+            abort(401, message="You must be shop staff member!")
         return folder
 
     @blp.arguments(FolderEditSchema)
+    @blp.arguments(ShopIDSchema, location="query")
     @blp.response(200, FolderReturnSchema, description="Folder edited successfully.")
     @blp.alt_response(404, description="Folder with this id wasn't found.")
     @blp.alt_response(409, description="There is an item with this name in the shop.")
-    def put(self, folder_edit_data, folder_id):
+    def put(self, folder_edit_data, shop_id_data, folder_id):
+        shop_id = shop_id_data["shop_id"]
         folder = ItemFolderModel.query.get_or_404(folder_id)
+        if folder.shop_id != shop_id:
+            abort(401, message="You must be shop staff member!")
 
         if "new_folder_name" in folder_edit_data and \
                 ItemFolderModel.query.filter(ItemFolderModel.shop_id == folder.shop_id,
@@ -61,11 +69,15 @@ class Folder(MethodView):
         db.session.commit()
         return folder
 
+    @blp.arguments(ShopIDSchema, location="query")
     @blp.response(200, MessageOnlySchema, description="Folder deleted successfully.")
     @blp.alt_response(404, description="Folder with this id wasn't found.")
     @blp.alt_response(409, description="There are still items in the folder.")
-    def delete(self, folder_id):
+    def delete(self, shop_id_data, folder_id):
+        shop_id = shop_id_data["shop_id"]
         folder = ItemFolderModel.query.get_or_404(folder_id)
+        if folder.shop_id != shop_id:
+            abort(401, message="You must be shop staff member!")
 
         if ItemModel.query.filter(ItemModel.folder_id == folder_id).first():
             # Not deleting if there are items in the folder

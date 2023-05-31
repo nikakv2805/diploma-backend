@@ -19,6 +19,15 @@ def is_shop_owner(shop_id: int):
         abort(401, message="Should be the shop owner.")
 
 
+def get_shop_id():
+    shop_id = get_jwt().get("shop_id")
+    return shop_id
+
+
+def get_shop_id_params():
+    return {"shop_id": get_shop_id()}
+
+
 def send_request(method, url, headers=None, data=None, params=None):
     if not headers:
         try:

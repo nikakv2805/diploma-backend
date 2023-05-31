@@ -5,7 +5,7 @@ from flask_jwt_extended import JWTManager
 from dotenv import load_dotenv
 import os
 
-from resources import AuthBlueprint, ShopBlueprint
+from resources import AuthBlueprint, ShopBlueprint, FolderBlueprint, ItemBlueprint
 from jwt_settings import jwt_set_up
 
 dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
@@ -35,5 +35,7 @@ def create_app():
 
     api.register_blueprint(AuthBlueprint)
     api.register_blueprint(ShopBlueprint)
+    api.register_blueprint(FolderBlueprint)
+    api.register_blueprint(ItemBlueprint)
 
     return app
