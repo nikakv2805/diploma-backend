@@ -9,7 +9,7 @@ services:
       - 5000:5000
     working_dir: /app
     volumes:
-      - /c/Users/nikak/Documents/study/4 курс/ПРАКТИКА/code/backend/auth_service:/app
+      - /e/nikakv/_DIPLOMA/backend/auth_service:/app
     env_file:
       - auth_service/.env
     restart: always
@@ -25,7 +25,7 @@ services:
       POSTGRES_PASSWORD: 1234
     restart: always
   gateway_service_back:
-    image: gateway_service:1.1.3
+    image: gateway_service:1.2
     depends_on:
       - auth_service_back
       - gateway_redis
@@ -35,7 +35,7 @@ services:
       - 5001:5001
     working_dir: /app
     volumes:
-      - /c/Users/nikak/Documents/study/4 курс/ПРАКТИКА/code/backend/gateway_service:/app
+      - /e/nikakv/_DIPLOMA/backend/gateway_service:/app
     env_file:
       - ./gateway_service/.env
     restart: always
@@ -56,7 +56,7 @@ services:
       - 5002:5002
     working_dir: /app
     volumes:
-      - /c/Users/nikak/Documents/study/4 курс/ПРАКТИКА/code/backend/shop_info_service:/app
+      - /e/nikakv/_DIPLOMA/backend/shop_info_service:/app
     env_file:
       - ./shop_info_service/.env
     restart: always
@@ -79,7 +79,7 @@ services:
       - 5003:5003
     working_dir: /app
     volumes:
-      - /c/Users/nikak/Documents/study/4 курс/ПРАКТИКА/code/backend/item_service:/app
+      - /e/nikakv/_DIPLOMA/backend/item_service:/app
     env_file:
       - ./item_service/.env
     restart: always
