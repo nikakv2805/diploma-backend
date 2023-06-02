@@ -1,1 +1,1 @@
-from models.user import UserModel
+from models.user import UserModel  # noqa

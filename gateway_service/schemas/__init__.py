@@ -2,11 +2,9 @@ from schemas.auth import OwnerRegisterSchema  # noqa
 from schemas.auth import SelfEditSchema  # noqa
 from schemas.auth import UserRegisterSchema  # noqa
 from schemas.auth import UserSchema  # noqa
-from schemas.general import (
-    MessageOnlySchema,  # noqa
-    MessageWithIDandFNSchema,
-    MessageWithIDSchema,
-)
+from schemas.general import MessageOnlySchema  # noqa
+from schemas.general import MessageWithIDandFNSchema  # noqa
+from schemas.general import MessageWithIDSchema  # noqa
 from schemas.item import FolderEditSchema  # noqa
 from schemas.item import FolderReturnSchema  # noqa
 from schemas.item import ItemCountEditSchema  # noqa

@@ -1,9 +1,6 @@
+from blocklist import BLOCKLIST, Blocklist
 from flask import jsonify
 from flask_jwt_extended import JWTManager
-# from models import BlocklistModel, UserModel
-from blocklist import Blocklist, BLOCKLIST
-
-import requests
 
 
 def jwt_set_up(jwt: JWTManager, blocklist: Blocklist = BLOCKLIST):

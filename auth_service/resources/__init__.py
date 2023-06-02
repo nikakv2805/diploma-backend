@@ -1,1 +1,1 @@
-from resources.user import blp as UserBlueprint
+from resources.user import blp as UserBlueprint  # noqa

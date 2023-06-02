@@ -1,12 +1,15 @@
-from flask import current_app
+from db import db
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
-from passlib.hash import pbkdf2_sha256
-
-from db import db
 from models import UserModel
-from schemas import UserGetSchema, UserRegisterSchema, UserSchema, MessageOnlySchema, SelfEditSchema
-
+from passlib.hash import pbkdf2_sha256
+from schemas import (
+    MessageOnlySchema,
+    SelfEditSchema,
+    UserGetSchema,
+    UserRegisterSchema,
+    UserSchema,
+)
 
 blp = Blueprint("Auth", "auth", description="Operations on users")
 
@@ -15,7 +18,9 @@ blp = Blueprint("Auth", "auth", description="Operations on users")
 class UserRegister(MethodView):
     @blp.arguments(UserRegisterSchema)
     @blp.response(201, description="Registers new user with unique email and username")
-    @blp.alt_response(409, description='Returned if user with this email or username already exists.')
+    @blp.alt_response(
+        409, description="Returned if user with this email or username already exists."
+    )
     def post(self, user_data):
         # current_app.logger.info(type(user_data))
         if UserModel.query.filter(UserModel.username == user_data["username"]).first():
@@ -32,7 +37,7 @@ class UserRegister(MethodView):
             shop_id=user_data["shop_id"],
             surname=user_data["surname"],
             name=user_data["name"],
-            lastname=user_data["lastname"]
+            lastname=user_data["lastname"],
         )
         db.session.add(user)
         db.session.commit()
@@ -43,9 +48,8 @@ class UserRegister(MethodView):
 @blp.route("/login")
 class UserLogin(MethodView):
     @blp.arguments(UserSchema)
-    @blp.response(200, UserGetSchema,
-                  description='Successfully log in.')
-    @blp.alt_response(401, description='Invalid credentials.')
+    @blp.response(200, UserGetSchema, description="Successfully log in.")
+    @blp.alt_response(401, description="Invalid credentials.")
     def post(self, user_data):
         user = UserModel.query.filter(
             UserModel.username == user_data["username"]
@@ -64,13 +68,13 @@ class User(MethodView):
     """
 
     @blp.response(200, UserGetSchema)
-    @blp.alt_response(404, description='User wasn\'t found')
+    @blp.alt_response(404, description="User wasn't found")
     def get(self, user_id):
         user = UserModel.query.get_or_404(user_id)
         return user
 
     @blp.response(200, MessageOnlySchema)
-    @blp.alt_response(404, description='User wasn\'t found')
+    @blp.alt_response(404, description="User wasn't found")
     def delete(self, user_id):
         user = UserModel.query.get_or_404(user_id)
         db.session.delete(user)
@@ -81,10 +85,8 @@ class User(MethodView):
 @blp.route("/<int:user_id>")
 class UserActions(MethodView):
     @blp.arguments(SelfEditSchema)
-    @blp.response(200, MessageOnlySchema,
-                  description='Successfully changed myself.')
-    @blp.alt_response(401,
-                      description='Invalid credentials.')
+    @blp.response(200, MessageOnlySchema, description="Successfully changed myself.")
+    @blp.alt_response(401, description="Invalid credentials.")
     def put(self, user_data, user_id):
         user = UserModel.query.get_or_404(user_id)
 

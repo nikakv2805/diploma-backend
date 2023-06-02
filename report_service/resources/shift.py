@@ -46,7 +46,7 @@ class Shift(MethodView):
 #     @blp.arguments(UserCheckSchema, location='query')
 #     @blp.response(200, MessageOnlySchema, description="Shift closed successfully.")
 #     @blp.alt_response(400, description="There are more then 1 shift opened now.")
-#     @blp.alt_response(401, 
+#     @blp.alt_response(401,
 #                       description="The same person should open and close the shift.")
 #     @blp.alt_response(404, description="Opened shifts not found")
 #     def post(self, shift_close_data, user_check_data, shop_id):

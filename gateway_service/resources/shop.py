@@ -18,7 +18,8 @@ class ShopRegister(MethodView):
     @blp.response(201, MessageOnlySchema, description="Registers new shop and user")
     @blp.alt_response(
         409,
-        description="Returned if there is already a shop with this address in the database,"
+        description="Returned if there is already a shop with this"
+        "address in the database,"
         "a user with that username or email or some internal error occurred.",
     )
     def post(self, shop_owner_data):
@@ -100,7 +101,8 @@ class User(MethodView):
     @blp.alt_response(404, description="Shop wasn't found.")
     @blp.alt_response(
         409,
-        description="Returned if there is already a shop with new address in the database.",
+        description="Returned if there is already a"
+        "shop with new address in the database.",
     )
     def put(self, shop_edit_details, shop_id):
         is_shop_owner(shop_id)
@@ -124,9 +126,11 @@ class User(MethodView):
 #     @jwt_required()
 #     @blp.arguments(ShopEditCashSchema)
 #     @blp.response(200, MessageOnlySchema)
-#     @blp.alt_response(401, description="Requester doesn't belong to the requested shop.")
+#     @blp.alt_response(401,
+#                       description="Requester doesn't belong to the requested shop.")
 #     @blp.alt_response(404, description='Shop wasn\'t found')
 #     def post(self, shop_cash_edit, shop_id):
 #         is_staff_member(shop_id)
-#         result = send_request('POST', f'{SHOP_SERVICE_URL}/shop/{shop_id}/cash_edit', data=shop_cash_edit)
+#         result = send_request('POST', f'{SHOP_SERVICE_URL}/shop/{shop_id}/cash_edit',
+#                               data=shop_cash_edit)
 #         return result["result_json"], result["status_code"]

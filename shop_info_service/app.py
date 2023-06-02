@@ -1,14 +1,13 @@
-from flask import Flask
-from flask_smorest import Api
-from flask_migrate import Migrate
-from dotenv import load_dotenv
 import os
 
 from db import db
-
+from dotenv import load_dotenv
+from flask import Flask
+from flask_migrate import Migrate
+from flask_smorest import Api
 from resources import ShopBlueprint
 
-dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
+dotenv_path = os.path.join(os.path.dirname(__file__), ".env")
 load_dotenv(dotenv_path)
 
 
@@ -27,7 +26,7 @@ def create_app():
     app.config["PROPAGATE_EXCEPTIONS"] = True
     db.init_app(app)
 
-    migrate = Migrate(app, db)
+    Migrate(app, db)
     api = Api(app)
 
     api.register_blueprint(ShopBlueprint)

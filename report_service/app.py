@@ -6,7 +6,7 @@ from flask import Flask
 from flask_smorest import Api
 from resources import ReceiptBlueprint, ReportBlueprint, ShiftBlueprint
 
-dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
+dotenv_path = os.path.join(os.path.dirname(__file__), ".env")
 load_dotenv(dotenv_path)
 
 

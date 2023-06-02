@@ -1,8 +1,6 @@
 from marshmallow import Schema, fields
 from marshmallow.validate import Length, OneOf
-from schemas.auth import SellerSchema
 from schemas.item import ItemSchema
-from schemas.shop import ShopInfoSchema
 
 
 class ReceiptSchema(Schema):

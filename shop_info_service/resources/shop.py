@@ -1,10 +1,8 @@
+from db import db
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
-
-from db import db
 from models import ShopModel
-from schemas import ShopSchema, MessageOnlySchema, ShopEditSchema
-
+from schemas import MessageOnlySchema, ShopEditSchema, ShopSchema
 
 blp = Blueprint("Shops", "shops", description="Operations on shops")
 
@@ -13,7 +11,11 @@ blp = Blueprint("Shops", "shops", description="Operations on shops")
 class ShopRegister(MethodView):
     @blp.arguments(ShopSchema)
     @blp.response(201, description="Registers new shop with unique address")
-    @blp.alt_response(409, description='Returned if there is already a shop with this address in the database.')
+    @blp.alt_response(
+        409,
+        description="Returned if there is already a shop with this address"
+        "in the database.",
+    )
     def post(self, shop_data):
         if ShopModel.query.filter(ShopModel.address == shop_data["address"]).first():
             abort(409, message="A shop is already registered on this address.")
@@ -21,7 +23,7 @@ class ShopRegister(MethodView):
         shop = ShopModel(
             name=shop_data["name"],
             legal_entity=shop_data["legal_entity"],
-            address=shop_data["address"]
+            address=shop_data["address"],
         )
         db.session.add(shop)
         db.session.commit()
@@ -31,10 +33,11 @@ class ShopRegister(MethodView):
 
 @blp.route("/shop/<int:shop_id>/owner/<int:owner_id>")
 class ShopOwner(MethodView):
-    @blp.response(200, MessageOnlySchema,
-                  description="Owner added to shop.")
+    @blp.response(200, MessageOnlySchema, description="Owner added to shop.")
     @blp.alt_response(404, description="Shop with this ID doesn't exist.")
-    @blp.alt_response(409, description="Shop with this ID already has its owner or vice versa.")
+    @blp.alt_response(
+        409, description="Shop with this ID already has its owner or vice versa."
+    )
     def post(self, shop_id, owner_id):
         selected_shop = ShopModel.query.get_or_404(shop_id)
 
@@ -54,15 +57,19 @@ class ShopOwner(MethodView):
 @blp.route("/shop/<int:shop_id>")
 class User(MethodView):
     @blp.response(200, ShopSchema)
-    @blp.alt_response(404, description='Shop wasn\'t found')
+    @blp.alt_response(404, description="Shop wasn't found")
     def get(self, shop_id):
         shop = ShopModel.query.get_or_404(shop_id)
         return shop
 
     @blp.arguments(ShopEditSchema)
     @blp.response(200, ShopSchema)
-    @blp.alt_response(404, description='Shop wasn\'t found')
-    @blp.alt_response(409, description='Returned if there is already a shop with new address in the database.')
+    @blp.alt_response(404, description="Shop wasn't found")
+    @blp.alt_response(
+        409,
+        description="Returned if there is already a shop with new"
+        "address in the database.",
+    )
     def put(self, shop_edit_details, shop_id):
         shop = ShopModel.query.get_or_404(shop_id)
 
@@ -71,8 +78,12 @@ class User(MethodView):
         if "new_legal_entity" in shop_edit_details:
             shop.legal_entity = shop_edit_details["new_legal_entity"]
         if "new_address" in shop_edit_details:
-            if ShopModel.query.filter(ShopModel.address == shop_edit_details["new_address"]).first():
-                abort(409, message="A shop is already registered on proposed new address.")
+            if ShopModel.query.filter(
+                ShopModel.address == shop_edit_details["new_address"]
+            ).first():
+                abort(
+                    409, message="A shop is already registered on proposed new address."
+                )
             shop.address = shop_edit_details["new_address"]
         if "new_owner_id" in shop_edit_details:
             shop.owner_id = shop_edit_details["new_owner_id"]
@@ -83,7 +94,7 @@ class User(MethodView):
         return shop
 
     @blp.response(200, MessageOnlySchema)
-    @blp.alt_response(404, description='Shop wasn\'t found')
+    @blp.alt_response(404, description="Shop wasn't found")
     def delete(self, shop_id):
         shop = ShopModel.query.get_or_404(shop_id)
         db.session.delete(shop)

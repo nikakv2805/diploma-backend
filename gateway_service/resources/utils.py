@@ -1,10 +1,10 @@
-from flask import request as flask_request, jsonify, current_app
-from flask_jwt_extended import (
-    get_jwt,
-)
-from flask_smorest import abort
-import requests
 import json
+
+import requests
+from flask import jsonify
+from flask import request as flask_request
+from flask_jwt_extended import get_jwt
+from flask_smorest import abort
 
 
 def is_staff_member(shop_id: int):
@@ -37,20 +37,22 @@ def send_request(method, url, headers=None, data=None, params=None):
 
     request_data = json.dumps(data, default=str) if data else None
 
-    if method == 'GET':
+    if method == "GET":
         response = requests.get(url, headers=headers, params=params)
-    elif method == 'POST':
+    elif method == "POST":
         response = requests.post(url, headers=headers, data=request_data, params=params)
-    elif method == 'PUT':
+    elif method == "PUT":
         response = requests.put(url, headers=headers, data=request_data, params=params)
-    elif method == 'DELETE':
+    elif method == "DELETE":
         response = requests.delete(url, headers=headers, params=params)
     else:
         raise ValueError(f"Invalid method: {method}")
 
     result_obj = json.loads(response.text)
 
-    return {"plain_response": response,
-            "status_code": response.status_code,
-            "result_obj": result_obj,
-            "result_json": jsonify(result_obj)}
+    return {
+        "plain_response": response,
+        "status_code": response.status_code,
+        "result_obj": result_obj,
+        "result_json": jsonify(result_obj),
+    }

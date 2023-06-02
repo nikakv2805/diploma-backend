@@ -1,11 +1,14 @@
-from flask import current_app
+from db import db
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
-
-from db import db
-from models import ItemModel, ItemFolderModel
-from schemas import FolderCreateSchema, MessageOnlySchema, FolderReturnSchema, FolderEditSchema, ShopIDSchema
-
+from models import ItemFolderModel, ItemModel
+from schemas import (
+    FolderCreateSchema,
+    FolderEditSchema,
+    FolderReturnSchema,
+    MessageOnlySchema,
+    ShopIDSchema,
+)
 
 blp = Blueprint("Folder", "folder", description="Operations on item folders")
 
@@ -17,8 +20,10 @@ class FolderCreate(MethodView):
     @blp.alt_response(404, description="Folder with that id wasn't found.")
     @blp.alt_response(409, description="There is an item like this in the shop.")
     def post(self, folder_data):
-        if ItemFolderModel.query.filter(ItemFolderModel.shop_id == folder_data["shop_id"],
-                                        ItemFolderModel.folder_name == folder_data["folder_name"]).first():
+        if ItemFolderModel.query.filter(
+            ItemFolderModel.shop_id == folder_data["shop_id"],
+            ItemFolderModel.folder_name == folder_data["folder_name"],
+        ).first():
             abort(409, message="There is already a folder with this name in the shop.")
 
         folder = ItemFolderModel(**folder_data)
@@ -30,7 +35,9 @@ class FolderCreate(MethodView):
 
 @blp.route("/shop/<int:shop_id>/folder")
 class FolderList(MethodView):
-    @blp.response(200, FolderReturnSchema(many=True), description="Folders returned successfully.")
+    @blp.response(
+        200, FolderReturnSchema(many=True), description="Folders returned successfully."
+    )
     def get(self, shop_id):
         return ItemFolderModel.query.filter(ItemFolderModel.shop_id == shop_id).all()
 
@@ -58,9 +65,13 @@ class Folder(MethodView):
         if folder.shop_id != shop_id:
             abort(401, message="You must be shop staff member!")
 
-        if "new_folder_name" in folder_edit_data and \
-                ItemFolderModel.query.filter(ItemFolderModel.shop_id == folder.shop_id,
-                                             ItemFolderModel.folder_name == folder_edit_data["new_folder_name"]).first():
+        if (
+            "new_folder_name" in folder_edit_data
+            and ItemFolderModel.query.filter(
+                ItemFolderModel.shop_id == folder.shop_id,
+                ItemFolderModel.folder_name == folder_edit_data["new_folder_name"],
+            ).first()
+        ):
             abort(409, message="There is already a folder with this name in the shop.")
 
         if "new_folder_name" in folder_edit_data:

@@ -1,7 +1,7 @@
 from marshmallow import Schema, fields
 from marshmallow.validate import Length
-
 from schemas.auth import SellerSchema
+
 
 class ShopSchema(Schema):
     id = fields.Int(dump_only=True)

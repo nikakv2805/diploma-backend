@@ -1,1 +1,1 @@
-from models.shop import ShopModel
+from models.shop import ShopModel  # noqa

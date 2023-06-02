@@ -1,1 +1,1 @@
-from resources.shop import blp as ShopBlueprint
+from resources.shop import blp as ShopBlueprint  # noqa

@@ -10,11 +10,21 @@ class PlainItemSchema(Schema):
     count_existing = fields.Float(dump_only=True)
     type = fields.Str(required=True, validate=OneOf([e.name for e in ItemTypeEnum]))
     unit = fields.Str(validate=OneOf([e.name for e in UnitsEnum]))
-    article = fields.Int(required=True, validate=Range(min=1, max=10**5-1,
-                                                       error="Article should be between 1 and 99999 inclusive."))
+    article = fields.Int(
+        required=True,
+        validate=Range(
+            min=1,
+            max=10**5 - 1,
+            error="Article should be between 1 and 99999 inclusive.",
+        ),
+    )
     # TODO: Add 6-symboled and other bar code types
-    bar_code = fields.Int(required=True, validate=Range(min=10**12, max=10**13-1,
-                                                        error="Bar code should be 13-digits number."))
+    bar_code = fields.Int(
+        required=True,
+        validate=Range(
+            min=10**12, max=10**13 - 1, error="Bar code should be 13-digits number."
+        ),
+    )
 
 
 class PlainFolderSchema(Schema):
@@ -50,19 +60,37 @@ class ItemEditSchema(Schema):
     new_price = fields.Decimal(places=2)
     new_type = fields.Str(validate=OneOf([e.name for e in ItemTypeEnum]))
     new_unit = fields.Str(validate=OneOf([e.name for e in UnitsEnum]))
-    new_article = fields.Int(validate=Range(min=1, max=10**5 - 1,
-                                            error="Article should be between 1 and 99999 inclusive."))
-    new_bar_code = fields.Int(validate=Range(min_inclusive=10**12, max=10**13 - 1,
-                                             error="Bar code should be 13-digits number."))
+    new_article = fields.Int(
+        validate=Range(
+            min=1,
+            max=10**5 - 1,
+            error="Article should be between 1 and 99999 inclusive.",
+        )
+    )
+    new_bar_code = fields.Int(
+        validate=Range(
+            min_inclusive=10**12,
+            max=10**13 - 1,
+            error="Bar code should be 13-digits number.",
+        )
+    )
     new_folder_id = fields.Int()
 
 
 class ItemSearchSchema(Schema):
     name_part = fields.Str(validate=Length(min=1, max=512))
-    article = fields.Int(validate=Range(min=1, max=10**5 - 1,
-                                        error="Article should be between 1 and 99999 inclusive."))
-    bar_code = fields.Int(validate=Range(min=10**12, max=10**13 - 1,
-                                         error="Bar code should be 13-digits number."))
+    article = fields.Int(
+        validate=Range(
+            min=1,
+            max=10**5 - 1,
+            error="Article should be between 1 and 99999 inclusive.",
+        )
+    )
+    bar_code = fields.Int(
+        validate=Range(
+            min=10**12, max=10**13 - 1, error="Bar code should be 13-digits number."
+        )
+    )
     folder_id = fields.Int()
 
 
