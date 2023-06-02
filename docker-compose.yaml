@@ -31,6 +31,7 @@ services:
       - gateway_redis
       - shop_info_service_back
       - item_service_back
+      - report_service_back
     ports:
       - 5001:5001
     working_dir: /app
@@ -94,9 +95,36 @@ services:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: 1234
     restart: always
+  report_service_back:
+    image: report_service:1.1
+    depends_on:
+      - report_db
+    ports:
+      - 5004:5004
+    working_dir: /app
+    volumes:
+      - /e/nikakv/_DIPLOMA/backend/report_service:/app
+    env_file:
+      - ./report_service/.env
+    restart: always
+  report_db:
+    image: bitnami/mongodb
+    environment:
+      MONGODB_DATABASE: reports
+      MONGODB_USERNAME: admin
+      MONGODB_PASSWORD: 1234
+      MONGODB_ROOT_PASSWORD: 1234
+    volumes:
+      - report_db:/data/db
+      - report_db_config:/data/configdb
+    ports:
+      - 27017:27017
+    restart: always
 
 volumes:
   auth_db:
   gateway_db:
   shop_info_db:
   item_db:
+  report_db:
+  report_db_config:

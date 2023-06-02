@@ -1,0 +1,7 @@
+flask
+Flask-Smorest
+Flask-PyMongo
+marshmallow
+python-dotenv
+gunicorn
+numpy
