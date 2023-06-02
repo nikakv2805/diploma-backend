@@ -1,10 +1,9 @@
-from flask import current_app
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
 
 from db import db
 from models import ShopModel
-from schemas import ShopSchema, MessageOnlySchema, ShopEditSchema, ShopEditCashSchema
+from schemas import ShopSchema, MessageOnlySchema, ShopEditSchema
 
 
 blp = Blueprint("Shops", "shops", description="Operations on shops")
@@ -22,8 +21,7 @@ class ShopRegister(MethodView):
         shop = ShopModel(
             name=shop_data["name"],
             legal_entity=shop_data["legal_entity"],
-            address=shop_data["address"],
-            current_cash=0
+            address=shop_data["address"]
         )
         db.session.add(shop)
         db.session.commit()
@@ -93,16 +91,16 @@ class User(MethodView):
         return {"message": "Shop deleted."}
 
 
-@blp.route("/shop/<int:shop_id>/cash_edit")
-class User(MethodView):
-    @blp.arguments(ShopEditCashSchema)
-    @blp.response(200, MessageOnlySchema)
-    @blp.alt_response(404, description='Shop wasn\'t found')
-    def post(self, shop_cash_edit, shop_id):
-        shop = ShopModel.query.get_or_404(shop_id)
+# @blp.route("/shop/<int:shop_id>/cash_edit")
+# class User(MethodView):
+#     @blp.arguments(ShopEditCashSchema)
+#     @blp.response(200, MessageOnlySchema)
+#     @blp.alt_response(404, description='Shop wasn\'t found')
+#     def post(self, shop_cash_edit, shop_id):
+#         shop = ShopModel.query.get_or_404(shop_id)
 
-        shop.current_cash += shop_cash_edit["cash_delta"]
+#         shop.current_cash += shop_cash_edit["cash_delta"]
 
-        db.session.add(shop)
-        db.session.commit()
-        return {"message": "Cash amount edited."}
+#         db.session.add(shop)
+#         db.session.commit()
+#         return {"message": "Cash amount edited."}

@@ -39,7 +39,7 @@ class ReceiptList(MethodView):
     @blp.arguments(ReceiptSchema)
     @blp.arguments(UserCheckSchema, location="query")
     @blp.response(
-        200, MessageWithIDandFNSchema, description="Receipt created successfully."
+        201, MessageWithIDandFNSchema, description="Receipt created successfully."
     )
     @blp.alt_response(400, description="There are more then 1 shift opened now.")
     @blp.alt_response(
@@ -70,7 +70,7 @@ class ReceiptList(MethodView):
 
         return {"message": "Receipt created.", "id": result.inserted_id, "fn": fn}
 
-    @blp.arguments(ReceiptQuerySchema)
+    @blp.arguments(ReceiptQuerySchema, location="query")
     @blp.response(200, ReceiptSchema(many=True))
     def get(self, query_data, shop_id):
         query = {"shop_id": shop_id}

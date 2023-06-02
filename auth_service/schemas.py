@@ -5,7 +5,9 @@ from marshmallow.validate import Length
 class UserSchema(Schema):
     id = fields.Int(dump_only=True)
     username = fields.Str(required=True, validate=Length(min=6, max=80))
-    password = fields.Str(required=True, load_only=True)  # TODO: validation of the password
+    password = fields.Str(
+        required=True, load_only=True
+    )  # TODO: validation of the password
 
 
 class UserRegisterSchema(UserSchema):
@@ -17,7 +19,9 @@ class UserRegisterSchema(UserSchema):
     lastname = fields.Str(required=True, load_only=True, validate=Length(max=80))
 
 
-class UserGetSchema(UserSchema):
+class UserGetSchema(Schema):
+    id = fields.Int(dump_only=True)
+    username = fields.Str(required=True, validate=Length(min=6, max=80))
     email = fields.Email(dump_only=True)
     is_owner = fields.Boolean(dump_only=True)
     shop_id = fields.Int(dump_only=True)
@@ -31,5 +35,7 @@ class MessageOnlySchema(Schema):
 
 
 class SelfEditSchema(Schema):
-    password = fields.Str(required=True, load_only=True)  # TODO: validation of the password
+    password = fields.Str(
+        required=True, load_only=True
+    )  # TODO: validation of the password
     new_password = fields.Str(required=True, load_only=True)

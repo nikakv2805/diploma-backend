@@ -25,3 +25,14 @@ class OwnerRegisterSchema(UserSchema):
     surname = fields.Str(required=True, load_only=True)
     name = fields.Str(required=True, load_only=True)
     lastname = fields.Str(required=True, load_only=True)
+
+
+class SellerSchema(Schema):
+    id = fields.Int(required=True)
+    username = fields.Str(required=True, validate=Length(min=6, max=80))
+    email = fields.Email(required=True, validate=Length(max=255))
+    is_owner = fields.Boolean(required=True)
+    shop_id = fields.Int(required=True)
+    surname = fields.Str(required=True, validate=Length(max=80))
+    name = fields.Str(required=True, validate=Length(max=80))
+    lastname = fields.Str(required=True, validate=Length(max=80))

@@ -1,15 +1,23 @@
-from flask import Flask
-from redis import Redis
-from flask_smorest import Api
-from flask_jwt_extended import JWTManager
-from dotenv import load_dotenv
 import os
 
-from resources import AuthBlueprint, ShopBlueprint, FolderBlueprint, ItemBlueprint
+from dotenv import load_dotenv
+from flask import Flask
+from flask_jwt_extended import JWTManager
+from flask_smorest import Api
 from jwt_settings import jwt_set_up
+from resources import (
+    AuthBlueprint,
+    FolderBlueprint,
+    ItemBlueprint,
+    ReceiptBlueprint,
+    ReportBlueprint,
+    ShiftBlueprint,
+    ShopBlueprint,
+)
 
-dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
+dotenv_path = os.path.join(os.path.dirname(__file__), ".env")
 load_dotenv(dotenv_path)
+
 
 def create_app():
     app = Flask(__name__)
@@ -28,8 +36,12 @@ def create_app():
     api = Api(app)
 
     app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY")
-    app.config["JWT_ACCESS_TOKEN_EXPIRES"] = int(os.environ.get("JWT_ACCESS_TOKEN_EXP", 900))
-    app.config["JWT_REFRESH_TOKEN_EXPIRES"] = int(os.environ.get("JWT_REFRESH_TOKEN_EXP", 1800))
+    app.config["JWT_ACCESS_TOKEN_EXPIRES"] = int(
+        os.environ.get("JWT_ACCESS_TOKEN_EXP", 900)
+    )
+    app.config["JWT_REFRESH_TOKEN_EXPIRES"] = int(
+        os.environ.get("JWT_REFRESH_TOKEN_EXP", 1800)
+    )
     jwt = JWTManager(app)
     jwt_set_up(jwt)
 
@@ -37,5 +49,8 @@ def create_app():
     api.register_blueprint(ShopBlueprint)
     api.register_blueprint(FolderBlueprint)
     api.register_blueprint(ItemBlueprint)
+    api.register_blueprint(ShiftBlueprint)
+    api.register_blueprint(ReceiptBlueprint)
+    api.register_blueprint(ReportBlueprint)
 
     return app

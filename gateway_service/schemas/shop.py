@@ -1,13 +1,14 @@
 from marshmallow import Schema, fields
 from marshmallow.validate import Length
 
+from schemas.auth import SellerSchema
 
 class ShopSchema(Schema):
     id = fields.Int(dump_only=True)
     name = fields.Str(required=True, validate=Length(max=256))
     legal_entity = fields.Str(required=True, validate=Length(max=256))
     address = fields.Str(required=True, validate=Length(max=256))
-    current_cash = fields.Decimal(places=2, dump_only=True)
+    owner_id = fields.Int(dump_only=True)
 
 
 class ShopRegisterSchema(Schema):
@@ -31,5 +32,9 @@ class ShopEditSchema(Schema):
     new_owner_id = fields.Int(load_only=True)
 
 
-class ShopEditCashSchema(Schema):
-    cash_delta = fields.Decimal(places=2, load_only=True)
+class ShopInfoSchema(Schema):
+    id = fields.Int(required=True)
+    name = fields.Str(required=True, validate=Length(max=256))
+    legal_entity = fields.Str(required=True, validate=Length(max=256))
+    address = fields.Str(required=True, validate=Length(max=256))
+    owner = fields.Nested(SellerSchema(), required=True)

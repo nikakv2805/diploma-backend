@@ -7,7 +7,7 @@ class ShopSchema(Schema):
     name = fields.Str(required=True, validate=Length(max=256))
     legal_entity = fields.Str(required=True, validate=Length(max=256))
     address = fields.Str(required=True, validate=Length(max=256))
-    current_cash = fields.Decimal(places=2, dump_only=True)
+    owner_id = fields.Int()
 
 
 class ShopEditSchema(Schema):
@@ -15,10 +15,6 @@ class ShopEditSchema(Schema):
     new_legal_entity = fields.Str(load_only=True, validate=Length(max=256))
     new_address = fields.Str(load_only=True, validate=Length(max=256))
     new_owner_id = fields.Int(load_only=True)
-
-
-class ShopEditCashSchema(Schema):
-    cash_delta = fields.Decimal(places=2, load_only=True)
 
 
 class MessageOnlySchema(Schema):

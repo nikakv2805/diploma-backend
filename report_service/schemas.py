@@ -45,12 +45,20 @@ class ItemSchema(Schema):
     count = fields.Float(required=True)
     type = fields.Str(required=True, validate=OneOf(["SERVICE", "COMMODITY"]))
     unit = fields.Str(validate=OneOf(["PIECE", "KILOGRAM", "LITER"]))
-    article = fields.Int(required=True, 
-                         validate=Range(min=1, max=10**5-1,
-                                        error="Article should be between 1 and 99999 inclusive."))
-    bar_code = fields.Int(required=True, 
-                          validate=Range(min=10**12, max=10**13-1,
-                                         error="Bar code should be 13-digits number."))
+    article = fields.Int(
+        required=True,
+        validate=Range(
+            min=1,
+            max=10**5 - 1,
+            error="Article should be between 1 and 99999 inclusive.",
+        ),
+    )
+    bar_code = fields.Int(
+        required=True,
+        validate=Range(
+            min=10**12, max=10**13 - 1, error="Bar code should be 13-digits number."
+        ),
+    )
     folder = fields.Nested(PlainFolderSchema())
 
 
@@ -63,7 +71,7 @@ class ShopInfoSchema(Schema):
 
 
 class ReceiptSchema(Schema):
-    id = fields.Str(dump_only=True)
+    _id = fields.Str(dump_only=True)
     items = fields.List(fields.Nested(ItemSchema()), required=True)
     seller = fields.Nested(SellerSchema(), required=True)
     shop = fields.Nested(ShopInfoSchema(), required=True)
