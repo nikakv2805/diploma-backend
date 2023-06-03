@@ -161,6 +161,8 @@ services:
     restart: always
     volumes:
       - rabbit:/var/lib/rabbitmq/mnesia/
+      - ./rabbitmq/rabbitmq.config:/etc/rabbitmq/rabbitmq.config
+      - ./rabbitmq/definitions.json:/opt/definitions1.json
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:15672" ]
       interval: 10s

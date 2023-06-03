@@ -146,13 +146,18 @@ api.register_blueprint(EmailBlueprint)
 
 app.logger.info(" Connecting to rabbitMQ ...")
 
-RABBIT_HOST = os.environ.get("RABBIT_HOST")
-RABBIT_PORT = os.environ.get("RABBIT_PORT")
+RABBIT_HOST = os.environ.get("RABBIT_HOST", "localhost")
+RABBIT_PORT = os.environ.get("RABBIT_PORT", 5672)
+RABBIT_USER = os.environ.get("RABBIT_USER", "guest")
+RABBIT_PASSWORD = os.environ.get("RABBIT_PASSWORD", "guest")
 
 with app.app_context():
     try:
+        credentials = pika.PlainCredentials(RABBIT_USER, RABBIT_PASSWORD)
         connection = pika.BlockingConnection(
-            pika.ConnectionParameters(host=RABBIT_HOST, port=RABBIT_PORT)
+            pika.ConnectionParameters(
+                host=RABBIT_HOST, port=RABBIT_PORT, credentials=credentials
+            )
         )
 
         channel = connection.channel()

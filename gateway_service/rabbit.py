@@ -6,6 +6,8 @@ from flask import current_app
 
 RABBIT_HOST = os.environ.get("RABBIT_HOST")
 RABBIT_PORT = os.environ.get("RABBIT_PORT")
+RABBIT_USER = os.environ.get("RABBIT_USER")
+RABBIT_PASSWORD = os.environ.get("RABBIT_PASSWORD")
 
 
 class RabbitConnectionPool:
@@ -24,8 +26,11 @@ class RabbitConnectionPool:
     def _reset_channels(self):
         if self.connection is None:
             try:
+                credentials = pika.PlainCredentials(RABBIT_USER, RABBIT_PASSWORD)
                 self.connection = pika.BlockingConnection(
-                    pika.ConnectionParameters(host=RABBIT_HOST, port=RABBIT_PORT)
+                    pika.ConnectionParameters(
+                        host=RABBIT_HOST, port=RABBIT_PORT, credentials=credentials
+                    )
                 )
             except pika.exceptions.AMQPConnectionError:
                 current_app.logger.warn(
@@ -83,8 +88,11 @@ class RabbitConnectionPool:
 
 def init_queues():
     try:
+        credentials = pika.PlainCredentials(RABBIT_USER, RABBIT_PASSWORD)
         connection = pika.BlockingConnection(
-            pika.ConnectionParameters(host=RABBIT_HOST, port=RABBIT_PORT)
+            pika.ConnectionParameters(
+                host=RABBIT_HOST, port=RABBIT_PORT, credentials=credentials
+            )
         )
     except pika.exceptions.AMQPConnectionError:
         return
@@ -92,5 +100,6 @@ def init_queues():
     channel.queue_declare(queue="receipt_queue", durable=True)
     channel.queue_declare(queue="report_queue", durable=True)
     connection.close()
+
 
 POOL = RabbitConnectionPool()
