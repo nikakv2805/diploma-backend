@@ -2,8 +2,8 @@
     "rabbit_version": "3.12.0",
     "users": [
         {
-            "name": "admin",
-            "password": "1234",
+            "name": "guest",
+            "password": "guest",
             "tags": "administrator"
         }
     ],
@@ -26,7 +26,7 @@
     "global_parameters": [
         {
             "name": "cluster_name",
-            "value": "rabbit@98c821300e49"
+            "value": ""
         }
     ],
     "policies": [],
