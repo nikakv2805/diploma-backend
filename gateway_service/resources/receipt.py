@@ -4,7 +4,12 @@ from flask.views import MethodView
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from flask_smorest import Blueprint
 from resources.utils import get_shop_id_params, is_staff_member, send_request
-from schemas import MessageWithIDandFNSchema, ReceiptQuerySchema, ReceiptSchema
+from schemas import (
+    MessageWithIDandFNSchema,
+    ReceiptLoadSchema,
+    ReceiptQuerySchema,
+    ReceiptReturnSchema,
+)
 
 blp = Blueprint("Receipt", "receipt", description="Operations on receipts")
 
@@ -17,7 +22,7 @@ SHOP_SERVICE_URL = os.environ.get("SHOP_SERVICE_URL")
 @blp.route("/shop/<int:shop_id>/receipt")
 class ReceiptList(MethodView):
     @jwt_required()
-    @blp.arguments(ReceiptSchema)
+    @blp.arguments(ReceiptLoadSchema)
     @blp.response(
         201, MessageWithIDandFNSchema, description="Receipt created successfully."
     )
@@ -95,7 +100,7 @@ class ReceiptList(MethodView):
 
     @jwt_required()
     @blp.arguments(ReceiptQuerySchema, location="query")
-    @blp.response(200, ReceiptSchema(many=True))
+    @blp.response(200, ReceiptReturnSchema(many=True))
     def get(self, query_data, shop_id):
         is_staff_member(shop_id)
 

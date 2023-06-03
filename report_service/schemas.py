@@ -78,6 +78,7 @@ class ReceiptSchema(Schema):
     sum = fields.Decimal(required=True, places=2)
     datetime = fields.DateTime(required=True)
     sell_type = fields.Str(required=True, validate=OneOf(["CARD", "CASH"]))
+    fn = fields.Int(dump_only=True)
 
 
 class ReceiptQuerySchema(Schema):

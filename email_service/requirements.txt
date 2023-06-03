@@ -1,0 +1,7 @@
+flask
+Flask-Smorest
+Flask-Mail
+marshmallow
+python-dotenv
+gunicorn
+redis

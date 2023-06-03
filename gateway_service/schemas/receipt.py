@@ -1,14 +1,22 @@
 from marshmallow import Schema, fields
 from marshmallow.validate import Length, OneOf
 from schemas.item import ItemSchema
+from schemas.auth import SellerSchema
+from schemas.shop import ShopInfoSchema
 
 
-class ReceiptSchema(Schema):
-    _id = fields.Str(dump_only=True)
+class ReceiptLoadSchema(Schema):
     items = fields.List(fields.Nested(ItemSchema()), required=True)
     sum = fields.Decimal(required=True, places=2)
     datetime = fields.DateTime(required=True)
     sell_type = fields.Str(required=True, validate=OneOf(["CARD", "CASH"]))
+
+
+class ReceiptReturnSchema(ReceiptLoadSchema):
+    _id = fields.Str(dump_only=True)
+    fn = fields.Int(dump_only=True)
+    seller = fields.Nested(SellerSchema(), dump_only=True)
+    shop = fields.Nested(ShopInfoSchema(), dump_only=True)
 
 
 class ReceiptQuerySchema(Schema):

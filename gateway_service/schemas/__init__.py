@@ -14,7 +14,9 @@ from schemas.item import ItemReturnSchema  # noqa
 from schemas.item import ItemSearchSchema  # noqa
 from schemas.item import PlainFolderSchema  # noqa
 from schemas.item import PlainItemSchema  # noqa
-from schemas.receipt import ReceiptQuerySchema, ReceiptSchema  # noqa
+from schemas.receipt import ReceiptLoadSchema  # noqa
+from schemas.receipt import ReceiptQuerySchema  # noqa
+from schemas.receipt import ReceiptReturnSchema  # noqa
 from schemas.report import XReport, ZReport  # noqa
 from schemas.shift import ShiftOpenSchema, ShiftSchema  # noqa
 from schemas.shop import ShopEditSchema  # noqa
