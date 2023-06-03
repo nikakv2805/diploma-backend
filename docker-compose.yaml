@@ -129,10 +129,10 @@ services:
     ports:
       - 27017:27017
     restart: always
-  email_service_back:
-    image: email_service:1.1
+  notification_service_back:
+    image: notification_service:1.1
     depends_on:
-      email_redis:
+      notification_redis:
         condition: service_started
       gateway_service_back:
         condition: service_started
@@ -140,17 +140,17 @@ services:
       - 5005:5005
     working_dir: /app
     volumes:
-      - /e/nikakv/_DIPLOMA/backend/email_service:/app
+      - /e/nikakv/_DIPLOMA/backend/notification_service:/app
     env_file:
-      - ./email_service/.env
+      - ./notification_service/.env
     restart: always
-  email_redis:
+  notification_redis:
     image: redislabs/redismod
     restart: always
     ports:
       - 6380:6379
     volumes:
-      - email_db:/data
+      - notification_db:/data
       - ./gateway_service/db/redis.conf:/usr/local/etc/redis/redis.conf
     #  TODO: Make redis to read config files; NOW REDIS IS UNPROTECTED
   rabbitmq:
@@ -176,5 +176,5 @@ volumes:
   item_db:
   report_db:
   report_db_config:
-  email_db:
+  notification_db:
   rabbit:
