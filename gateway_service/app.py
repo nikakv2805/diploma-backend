@@ -5,10 +5,12 @@ from flask import Flask
 from flask_jwt_extended import JWTManager
 from flask_smorest import Api
 from jwt_settings import jwt_set_up
+from rabbit import POOL, init_queues
 from resources import (
     AuthBlueprint,
     FolderBlueprint,
     ItemBlueprint,
+    NotificationBlueprint,
     ReceiptBlueprint,
     ReportBlueprint,
     ShiftBlueprint,
@@ -52,5 +54,9 @@ def create_app():
     api.register_blueprint(ShiftBlueprint)
     api.register_blueprint(ReceiptBlueprint)
     api.register_blueprint(ReportBlueprint)
+    api.register_blueprint(NotificationBlueprint)
+    POOL.init(app)
+
+    init_queues()
 
     return app

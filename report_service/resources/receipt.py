@@ -126,3 +126,12 @@ class ReceiptList(MethodView):
         result_receipts = list(db.db.receipts.find(query))
 
         return result_receipts
+
+
+@blp.route("/shop/<int:shop_id>/receipt/<id>")
+class Receipt(MethodView):
+    @blp.response(200, ReceiptSchema, description="Found successfully")
+    @blp.alt_response(404, description="Receipt not found")
+    def get(self, shop_id, id):
+        result_receipt = db.db.receipts.find_one_or_404({"_id": ObjectId(id)})
+        return result_receipt

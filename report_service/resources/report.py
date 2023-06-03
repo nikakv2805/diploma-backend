@@ -168,3 +168,12 @@ class ZReports(MethodView):
         )
 
         return z_reports
+
+
+@blp.route("/report/z/<int:fn>")
+class ZReport(MethodView):
+    @blp.response(200, ZReport, description="Found successfully")
+    @blp.alt_response(404, description="Report not found")
+    def get(self, fn):
+        result_report = db.db.reports.find_one_or_404({"type": "Z", "fn": fn})
+        return result_report

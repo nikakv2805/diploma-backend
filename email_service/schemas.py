@@ -39,7 +39,7 @@ class ReceiptSchema(Schema):
 
 
 class ReceiverEmailSchema(Schema):
-    email = fields.Str(required=True)
+    email = fields.Email(required=True)
 
 
 class ReportSchema(Schema):

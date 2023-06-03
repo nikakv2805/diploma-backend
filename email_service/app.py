@@ -1,5 +1,7 @@
 import os
 
+import pika
+from callbacks import create_callback_receipt, create_callback_report
 from dotenv import load_dotenv
 from flask import Flask, render_template
 from flask.views import MethodView
@@ -140,3 +142,41 @@ class SendReport(MethodView):
 
 
 api.register_blueprint(EmailBlueprint)
+
+
+app.logger.info(" Connecting to rabbitMQ ...")
+
+RABBIT_HOST = os.environ.get("RABBIT_HOST")
+RABBIT_PORT = os.environ.get("RABBIT_PORT")
+
+with app.app_context():
+    try:
+        connection = pika.BlockingConnection(
+            pika.ConnectionParameters(host=RABBIT_HOST, port=RABBIT_PORT)
+        )
+
+        channel = connection.channel()
+        channel.queue_declare(queue="task_queue", durable=True)
+
+        app.logger.info(" Waiting for messages...")
+
+        channel.basic_qos(prefetch_count=1)
+        channel.basic_consume(
+            queue="receipt_queue",
+            on_message_callback=create_callback_receipt(
+                app, redis_client_receipts, mail
+            ),
+        )
+        channel.basic_consume(
+            queue="report_queue",
+            on_message_callback=create_callback_report(
+                app, redis_client_receipts, mail
+            ),
+        )
+        channel.start_consuming()
+    except pika.exceptions.AMQPConnectionError:
+        app.logger.warning(
+            "Failed to connect to RabbitMQ service. Message wont be sent."
+        )
+    except Exception as e:
+        app.logger.warn(f"Unexpected exception: {e}")

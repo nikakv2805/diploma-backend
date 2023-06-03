@@ -22,3 +22,4 @@ from schemas.shift import ShiftOpenSchema, ShiftSchema  # noqa
 from schemas.shop import ShopEditSchema  # noqa
 from schemas.shop import ShopRegisterSchema  # noqa
 from schemas.shop import ShopSchema  # noqa
+from schemas.notification import ReceiverContactsSchema  # noqa

@@ -25,15 +25,24 @@ services:
       POSTGRES_PASSWORD: 1234
     restart: always
   gateway_service_back:
-    image: gateway_service:1.2
+    image: gateway_service:1.3
     depends_on:
-      - auth_service_back
-      - gateway_redis
-      - shop_info_service_back
-      - item_service_back
-      - report_service_back
+      auth_service_back:
+        condition: service_started
+      gateway_redis:
+        condition: service_started
+      shop_info_service_back:
+        condition: service_started
+      item_service_back:
+        condition: service_started
+      report_service_back:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
     ports:
       - 5001:5001
+    links:
+      - rabbitmq
     working_dir: /app
     volumes:
       - /e/nikakv/_DIPLOMA/backend/gateway_service:/app
@@ -121,9 +130,12 @@ services:
       - 27017:27017
     restart: always
   email_service_back:
-    image: email_service:1.0
+    image: email_service:1.1
     depends_on:
-      - email_redis
+      email_redis:
+        condition: service_started
+      gateway_service_back:
+        condition: service_started
     ports:
       - 5005:5005
     working_dir: /app
@@ -141,6 +153,19 @@ services:
       - email_db:/data
       - ./gateway_service/db/redis.conf:/usr/local/etc/redis/redis.conf
     #  TODO: Make redis to read config files; NOW REDIS IS UNPROTECTED
+  rabbitmq:
+    image: rabbitmq-curl:1.0
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    restart: always
+    volumes:
+      - rabbit:/var/lib/rabbitmq/mnesia/
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:15672" ]
+      interval: 10s
+      timeout: 10s
+      retries: 5
 
 volumes:
   auth_db:
@@ -150,3 +175,4 @@ volumes:
   report_db:
   report_db_config:
   email_db:
+  rabbit:

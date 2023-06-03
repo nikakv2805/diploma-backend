@@ -5,3 +5,4 @@ marshmallow
 python-dotenv
 gunicorn
 redis
+pika
