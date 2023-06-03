@@ -74,7 +74,7 @@ class ReceiptList(MethodView):
     @blp.arguments(ReceiptQuerySchema, location="query")
     @blp.response(200, ReceiptSchema(many=True))
     def get(self, query_data, shop_id):
-        query = {"shop_id": shop_id}
+        query = {"shop.id": shop_id}
 
         query_data = convert_decimal(query_data)
 

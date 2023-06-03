@@ -14,3 +14,6 @@ class XReport(Schema):
 class ZReport(XReport):
     fn = fields.Int(dump_only=True)
     cash_given = fields.Decimal(places=2)
+
+class ZReportWWarning(ZReport):
+    warning = fields.Str(dump_only=True)
