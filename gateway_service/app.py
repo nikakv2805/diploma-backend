@@ -2,6 +2,7 @@ import os
 
 from dotenv import load_dotenv
 from flask import Flask
+from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from flask_smorest import Api
 from jwt_settings import jwt_set_up
@@ -34,6 +35,8 @@ def create_app():
         "OPENAPI_SWAGGER_UI_URL"
     ] = "https://cdn.jsdelivr.net/npm/swagger-ui-dist/"
     app.config["PROPAGATE_EXCEPTIONS"] = True
+
+    CORS(app)
 
     api = Api(app)
 

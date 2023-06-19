@@ -7,3 +7,4 @@ gunicorn
 requests
 redis
 pika
+flask-cors

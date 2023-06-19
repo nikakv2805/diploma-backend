@@ -82,7 +82,11 @@ class UserLogin(MethodView):
             },
         )
 
-        return {"access_token": access_token, "refresh_token": refresh_token}
+        return {
+            "access_token": access_token,
+            "refresh_token": refresh_token,
+            "shop_id": user_data["shop_id"],
+        }
 
 
 @blp.route("/logout")
